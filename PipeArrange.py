@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.artist import Artist
 import copy
-import time
+
 class Pip_arrangement:
     def __init__(self,s1,s2,s3,e,r,N,ArrangeType):
         self.s1 = s1
