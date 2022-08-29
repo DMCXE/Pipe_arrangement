@@ -16,12 +16,25 @@ class Pip_arrangement:
         pos = np.zeros([1,2])
         for i in range(int(2*np.sqrt(self.N))):
             for j in range(int(2*np.sqrt(self.N))):
-                pos = np.append(pos,[[self.s1*j,self.s3+self.s2*(i+1)]],axis=0)
+                pos = np.append(pos,[[self.s1*j,0.5*self.s3+self.s1*(i+1)]],axis=0)
         pos = pos[1:]
         return pos
 
+    def point_RegularTriangle(self):
+        pos = np.zeros([1, 2])
+        for i in range(int(2 * np.sqrt(self.N))):
+            if i%2 != 0:
+                for j in range(int(2 * np.sqrt(self.N))):
+                    pos = np.append(pos, [[self.s1 * j, 0.5*self.s3 + self.s2 * (i + 1)]], axis=0)
+            else:
+                for j in range(int(2 * np.sqrt(self.N))):
+                    pos = np.append(pos, [[0.5*self.s1+self.s1 * j, 0.5 * self.s3 + self.s2 * (i + 1)]], axis=0)
+        pos = pos[1:]
+        return pos
+
+
     def pos_stard(self):
-        pos = copy.deepcopy(self.point_squar())
+        pos = copy.deepcopy(self.point_RegularTriangle())
         R = self.s1 + self.e
         count_tot = 0
         count_Y = 0
@@ -68,7 +81,7 @@ def visualize(possiton,r):
     for pic in dr:
         axes.add_artist(pic)
     Artist.set(axes, xlabel='X-Axis', ylabel='Y-Axis',
-               xlim=(-3000, 3000), ylim=(-3000, 3000),
+               xlim=(-300, 300), ylim=(-300, 300),
                title='Arrangement of heat transfer tubes')
 
     plt.savefig('test111.png', dpi=1200, bbox_inches='tight')
@@ -89,7 +102,7 @@ def test_visualize():
     s3 = 2 * s1
     e = 0.1
     r = 1.1
-    N = 3000
+    N = 3227
 
     pipe = Pip_arrangement(s1,s2,s3,e,r,N)
     pos = pipe.arrangement()[1]
