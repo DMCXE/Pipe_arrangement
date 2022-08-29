@@ -94,12 +94,12 @@ class Pip_arrangement:
         self.Pippos = pos
 
 
-    def visualize(self,possiton,r):
+    def visualize(self):
         R = self.R
         dr = []
         figure, axes = plt.subplots()
-        for xx in possiton:
-            dr.append(plt.Circle(xx, r, fill=False, lw=0.25))
+        for xx in self.Pippos:
+            dr.append(plt.Circle(xx, self.r, fill=False, lw=0.25))
         dr.append(plt.Circle(np.array([0.,0.]), R, fill=False, lw=0.25))
         axes.set_aspect(1)
         for pic in dr:
