@@ -4,14 +4,20 @@ from matplotlib.artist import Artist
 import copy
 import time
 class Pip_arrangement:
-    def __init__(self,s1,s2,s3,e,r,N):
+    def __init__(self,s1,s2,s3,e,r,N,ArrangeType):
         self.s1 = s1
         self.s2 = s2
         self.s3 = s3
         self.e = e
         self.r = r
         self.N = N
+        self.ty = ArrangeType
+        self.PipeNum = 0
+        self.Pippos = 0
+        self.R = 0
 
+    #方形排布：生产初始点
+    #默认s1 == s2
     def point_squar(self):
         pos = np.zeros([1,2])
         for i in range(int(2*np.sqrt(self.N))):
@@ -20,6 +26,7 @@ class Pip_arrangement:
         pos = pos[1:]
         return pos
 
+    # 正三角形排布：生成初始点
     def point_RegularTriangle(self):
         pos = np.zeros([1, 2])
         for i in range(int(2 * np.sqrt(self.N))):
@@ -32,12 +39,24 @@ class Pip_arrangement:
         pos = pos[1:]
         return pos
 
+    #自适应R迭代补偿：依据s1的数量级判断R的迭代补偿，设定为s1的小一数量级（3.2->1）
+    def minstep(self):
+        s = self.s1
+        n = 0
+        while np.power(10,n)*s < 1:
+            n = n+1
+        return 1/np.power(10,n)
 
+    #在第一象限中找到合适的点
     def pos_stard(self):
-        pos = copy.deepcopy(self.point_RegularTriangle())
+        if self.ty == 'Squar':
+            pos = copy.deepcopy(self.point_squar())
+        else:
+            pos = copy.deepcopy(self.point_RegularTriangle())
         R = self.s1 + self.e
         count_tot = 0
         count_Y = 0
+        step = self.minstep()
         while count_tot < (self.N-2*count_Y)/4+count_Y:
             count_Y = 0
             pos_stard = np.zeros([1, 2])
@@ -49,13 +68,13 @@ class Pip_arrangement:
                     count_Y = count_Y+1
             pos_stard = copy.deepcopy(pos_stard[1:])
             count_tot = len(pos_stard)
-            R = R + 1 #mm
-        return R,pos_stard,count_tot
+            R = R + step #mm
+        self.R = R
+        return pos_stard
 
     def arrangement(self):
-        pos = copy.deepcopy(self.pos_stard()[1])
-        pos_first_with_axis_y = copy.deepcopy(self.pos_stard()[1])
-        R =  self.pos_stard()[0]
+        pos = copy.deepcopy(self.pos_stard())
+        pos_first_with_axis_y = copy.deepcopy(pos)
         pos_second_without_axis_y = np.zeros([1,2])
         for ppp in pos_first_with_axis_y:
             if ppp[0] != 0:
@@ -68,35 +87,41 @@ class Pip_arrangement:
         for q in pos_down:
             q[1] = -q[1]
         pos = np.append(ppos,pos_down,axis=0)
-        L =len(pos)
+        L = len(pos)
+        self.PipeNum = L
+        self.Pippos = pos
 
-        return R,pos,L
 
-def visualize(possiton,r):
-    dr = []
-    figure, axes = plt.subplots()
-    for xx in possiton:
-        dr.append(plt.Circle(xx, r, fill=False, lw=0.25))
-    axes.set_aspect(1)
-    for pic in dr:
-        axes.add_artist(pic)
-    Artist.set(axes, xlabel='X-Axis', ylabel='Y-Axis',
-               xlim=(-300, 300), ylim=(-300, 300),
-               title='Arrangement of heat transfer tubes')
+    def visualize(self,possiton,r):
+        R = self.R
+        dr = []
+        figure, axes = plt.subplots()
+        for xx in possiton:
+            dr.append(plt.Circle(xx, r, fill=False, lw=0.25))
+        dr.append(plt.Circle(np.array([0.,0.]), R, fill=False, lw=0.25))
+        axes.set_aspect(1)
+        for pic in dr:
+            axes.add_artist(pic)
+            #
+        Artist.set(axes, xlabel='X-Axis', ylabel='Y-Axis',
+                   xlim=(-1.1*R, 1.1*R), ylim=(-1.1*R, 1.1*R),
+                   title='Arrangement of heat transfer tubes')
 
-    plt.savefig('test111.png', dpi=1200, bbox_inches='tight')
-    plt.title('Arrangement of heat transfer tubes')
-    plt.show()
+        plt.savefig('test111.png', dpi=150, bbox_inches='tight')
+        plt.title('Arrangement of heat transfer tubes')
+        plt.show()
 
+
+'''
 def test_visualize():
-    '''
+    
     s1 = 32
     s2 = s1 * np.sqrt(3)/2
     s3 = 2 * s1
     e = 1
     r = 22/2
     N = 3220
-    '''
+  
     s1 = 3.2
     s2 = s1 * np.sqrt(3)/2
     s3 = 2 * s1
@@ -104,10 +129,10 @@ def test_visualize():
     r = 1.1
     N = 3227
 
-    pipe = Pip_arrangement(s1,s2,s3,e,r,N)
+    pipe = Pip_arrangement(s1,s2,s3,e,r,N,'Tri')
     pos = pipe.arrangement()[1]
-
-    visualize(pos,r)
+    print(pipe.PipNum)
+    pipe.visualize(pos,r)
 
 
 if __name__ == '__main__':
@@ -115,6 +140,6 @@ if __name__ == '__main__':
     test_visualize()
     stt = time.time()
     print(stt-st)
-
+'''
 
 
