@@ -5,13 +5,15 @@ import copy
 
 class Pip_arrangement:
     def __init__(self,s1,s2,s3,e,r,N,ArrangeType):
-        self.s1 = s1
-        self.s2 = s2
-        self.s3 = s3
-        self.e = e
-        self.r = r
-        self.N = N
-        self.ty = ArrangeType
+        #初始参数
+        self.s1 = s1        # 管心水平间距
+        self.s2 = s2        # 管心竖直间距
+        self.s3 = s3        # 两侧管间距
+        self.e = e          # 最外侧管与套桶距离条件
+        self.r = r          # 单管外径
+        self.N = N          # 总管数
+        self.ty = ArrangeType #排管形式，传入"Squar"时为方形，其它参数时为正三角形
+        #计算结果
         self.PipeNum = 0
         self.Pippos = 0
         self.R = 0
@@ -102,44 +104,10 @@ class Pip_arrangement:
         axes.set_aspect(1)
         for pic in dr:
             axes.add_artist(pic)
-            #
+        #自适应坐标轴
         Artist.set(axes, xlabel='X-Axis', ylabel='Y-Axis',
                    xlim=(-1.1*R, 1.1*R), ylim=(-1.1*R, 1.1*R),
                    title='Arrangement of heat transfer tubes')
-
         plt.savefig('test111.png', dpi=150, bbox_inches='tight')
         plt.title('Arrangement of heat transfer tubes')
         plt.show()
-
-
-'''
-def test_visualize():
-    
-    s1 = 32
-    s2 = s1 * np.sqrt(3)/2
-    s3 = 2 * s1
-    e = 1
-    r = 22/2
-    N = 3220
-  
-    s1 = 3.2
-    s2 = s1 * np.sqrt(3)/2
-    s3 = 2 * s1
-    e = 0.1
-    r = 1.1
-    N = 3227
-
-    pipe = Pip_arrangement(s1,s2,s3,e,r,N,'Tri')
-    pos = pipe.arrangement()[1]
-    print(pipe.PipNum)
-    pipe.visualize(pos,r)
-
-
-if __name__ == '__main__':
-    st = time.time()
-    test_visualize()
-    stt = time.time()
-    print(stt-st)
-'''
-
-
