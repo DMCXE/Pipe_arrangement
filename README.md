@@ -1,4 +1,110 @@
 # Pipe_arrangement
+# V1.0正式版本
+# 使用说明
+
+1. 在本博客拷贝PipeArrange.py源码或通过Github拉取，并保存至项目目录下。Github仓库地址为：https://github.com/DMCXE/Pipe_arrangement
+
+2. 通过以下方法引用计算类：
+
+   ```python
+   from PipeArrange import Pip_arrangement
+   ```
+
+3. 传入参数实例化类：其中，**s1**为管心水平间距，**s2**为管心竖直间距， **s3**为两侧管间距，**e**为最外侧管与套桶距离条件，**r**为单管外径，**N**为总管数，**'Tri'**为排管形式，传入"Squar"时为方形，其它参数时为正三角形。
+
+   ```python
+   pipe = Pip_arrangement(s1, s2, s3, e, r, N, 'Tri')
+   #计算，必须有
+   pipe.arrangement()
+   ```
+
+4. 如果需要位置、半径、数量信息，在步骤三后采用以下方式：
+
+   ```python
+   #位置、数量、半径
+   pos = pipe.Pippos
+   PipNum = pipe.PipeNum
+   R = pipe.R
+   ```
+
+5. 如果需要可视化，则在步骤三计算后采用以下方式：
+
+   ```python
+   pipe.visualize()
+   ```
+
+
+ 数据来源：核动力设备大作业
+
+```python
+s1 = 32 * 1e-3
+s2 = s1 * np.sqrt(3) / 2
+s3 = 2 * s1
+e = 32 * 1e-3
+r = 11  * 1e-3
+N = 3227
+```
+
+### 采用正三角形排布
+
+耗时(s)： 1.2404248714447021
+管数： 3282
+套筒半径： 1.0440000000000007
+![正三角形排布.png](http://dmcxe.com/usr/uploads/2022/08/2506516969.png)
+
+### 采用正方角形排布
+
+耗时(s)： 1.3390185832977295
+管数： 3256
+套筒半径： 1.1140000000000008
+![正方形排布.png](http://dmcxe.com/usr/uploads/2022/08/3584371288.png)
+
+## 示例代码
+
+```python
+from PipeArrange import Pip_arrangement
+import numpy as np
+import time
+
+s1 = 32 * 1e-3
+s2 = s1 * np.sqrt(3) / 2
+s3 = 2 * s1
+e = 32 * 1e-3
+r = 11  * 1e-3
+N = 3227
+
+st = time.time()
+#实例化与计算
+pipe = Pip_arrangement(s1, s2, s3, e, r, N, 'Tri')
+#pipe = Pip_arrangement(s1, s2, s3, e, r, N, 'Squar')
+pipe.arrangement()
+
+#参数
+pos = pipe.Pippos
+PipNum = pipe.PipeNum
+R = pipe.R
+
+stt = time.time()
+print("耗时(s)：",stt-st)
+print("管数：",PipNum)
+print("套筒半径：",R)
+print("位置：",pos)
+#可视化
+pipe.visualize()
+```
+---------
+# 优化说明
+
+相比于V0.9，正式版对计算优化、简便性与自适应特性进行了大量更新。在同样1000根管子的条件下，V1.0版本**用时0.21867895126342773s，增速了7400倍**!
+
+## 优化与改进
+
+1. **优化数学关系。**通过排布圆面积与套管截面面积的关系，减少了初期生成及遍历的点阵数量，使计算复杂度由N^2降低到N。
+2. **优化数据结构。**采用常量方式赋值，减少了统一结果函数的重复调用。
+3. **增加自适应性。**对于R的迭代添加了自适应步长，对图像绘制添加了自适应绘制区域，扩展了小助手的使用范围。
+
+------
+# V0.9版本及项目背景介绍
 # 项目源起
 
 大三下学期，涉及了两个关于换热器的课程设计&核动力设备大作业，不出意外，过段时间的课设三也是直立式蒸汽发生器。无论在课设还是大作业，排管始终是一个令人头疼的问题。课设中1.1倍根号下总管数确定中心管数属实令人费解（考虑优化的时候知道是怎么回事了）。核动力设备大作业中也因为没有合理的排布（类圆形）而被老师批评。对于数百个乃至数千根管，如何快速、简便、合理的绘制成了萦绕在我心头解不开的问题。于是从暑假拖到了现在。
