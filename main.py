@@ -14,8 +14,8 @@ class Pip_arrangement:
 
     def point_squar(self):
         pos = np.zeros([1,2])
-        for i in range(self.N):
-            for j in range(self.N):
+        for i in range(int(2*np.sqrt(self.N))):
+            for j in range(int(2*np.sqrt(self.N))):
                 pos = np.append(pos,[[self.s1*j,self.s3+self.s2*(i+1)]],axis=0)
         pos = pos[1:]
         return pos
@@ -89,7 +89,7 @@ def test_visualize():
     s3 = 2 * s1
     e = 0.1
     r = 1.1
-    N = 1000
+    N = 3000
 
     pipe = Pip_arrangement(s1,s2,s3,e,r,N)
     pos = pipe.arrangement()[1]
